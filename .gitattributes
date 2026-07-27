@@ -1,0 +1,16 @@
+# Normalize line endings: text files use LF in the repo, checked out native on Windows.
+* text=auto eol=lf
+
+# Explicit text types
+*.py    text
+*.md    text
+*.yaml  text
+*.yml   text
+*.toml  text
+*.json  text
+*.cfg   text
+
+# Binary (never touch line endings)
+*.pcap  binary
+*.pcapng binary
+*.png   binary
