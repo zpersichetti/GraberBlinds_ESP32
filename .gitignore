@@ -1,0 +1,11 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Captures, GATT dumps, run logs, action logs — contain per-device tokens / raw BLE traffic
+data/
+
+# Real secrets (never commit) — use secrets.yaml.example as the template
+secrets.yaml
+esphome/secrets.yaml
