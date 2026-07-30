@@ -28,6 +28,7 @@ async def map_batch(
     response: bool = True,
     settle_timeout: float = 30.0,
     burst: bool = False,
+    subscribe: bool = True,
 ) -> dict:
     """Run a batch of (handle, payload) writes in one held-open session.
 
@@ -51,7 +52,8 @@ async def map_batch(
     rd = _run_dir(data_dir)
     records = []
 
-    async with GattSession(address, notify_uuids=notify_uuids, do_pair=do_pair) as sess:
+    async with GattSession(address, notify_uuids=notify_uuids, do_pair=do_pair,
+                           subscribe=subscribe) as sess:
         for i, (handle, payload) in enumerate(payloads):
             # A "sleep" step just dwells inside the held connection (lets a rail travel
             # before the next command), capturing notifications during the wait.

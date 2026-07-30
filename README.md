@@ -60,8 +60,23 @@ Full details in [`notes/protocol.md`](notes/protocol.md). In brief:
    WiFi, an ESPHome `api_key`, and an `ap_password`.
 3. **Your MACs + tokens:** in `esphome/graber-blinds.yaml`, set each `mac_address` to your
    blind's, and replace the **placeholder auth-token bytes** with your captured token (below).
-4. **Flash** with ESPHome, add the device in Home Assistant. You get preset buttons + position
-   sensors per blind.
+4. **Flash** with ESPHome, add the device in Home Assistant. You get position sliders + sensors
+   per blind.
+
+> ### ⚠️ You MUST replace the placeholder auth tokens
+> This repo ships each blind's auth token as a **placeholder**: `value: [0x30, 0x30, 0x30, 0x30,
+> 0x30, 0x30, 0x30]` (ASCII `"0000000"`). If you flash it unchanged, the ESP32 will **connect
+> and read position fine but every movement command is silently ignored** — the motor rejects
+> the bad token. Replace all three (one per blind, in each `on_connect` auth write) with your
+> real captured token — e.g. for `"1234567"` use `value: [0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37]`.
+> Keep the placeholders in any copy you push back to a public repo.
+
+### Troubleshooting: "connects but doesn't move"
+
+Almost always the **placeholder token** (see warning above) — check the ESPHome logs for the
+connect+writes; if they happen but nothing moves, your token bytes are wrong. Also note the
+motor travels for **several seconds and stops advertising while moving**, so its position
+won't update until it settles — don't judge a command as failed too early.
 
 ### Capturing your per-device token
 

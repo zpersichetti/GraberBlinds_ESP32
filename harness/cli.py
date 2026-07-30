@@ -143,7 +143,9 @@ def map_batch(address: str,
               do_pair: bool = typer.Option(False),
               no_response: bool = typer.Option(False),
               burst: bool = typer.Option(False, help="Send writes back-to-back, single settle "
-                                         "after the last (for target+execute goto commands)")):
+                                         "after the last (for target+execute goto commands)"),
+              no_notify: bool = typer.Option(False, help="Do NOT enable notifications on "
+                                             "connect (test whether the blind needs them)")):
     """Gated batch of writes in one session. Format each --payload as HANDLE:HEX."""
     parsed = []
     for item in payload:

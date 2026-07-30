@@ -155,6 +155,7 @@ class GattSession:
     address: str
     notify_uuids: list[str] | None = None
     do_pair: bool = False
+    subscribe: bool = True   # enable notifications on connect (part of the app handshake?)
     connect_timeout: float = 20.0
     _client: BleakClient | None = field(default=None, init=False)
     events: list[dict] = field(default_factory=list, init=False)
@@ -168,7 +169,7 @@ class GattSession:
                 await self._client.pair()
             except NotImplementedError:
                 pass
-        for svc in self._client.services:
+        for svc in (self._client.services if self.subscribe else []):
             for ch in svc.characteristics:
                 if "notify" not in ch.properties and "indicate" not in ch.properties:
                     continue
