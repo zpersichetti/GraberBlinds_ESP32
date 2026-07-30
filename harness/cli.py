@@ -148,7 +148,10 @@ def map_batch(address: str,
     parsed = []
     for item in payload:
         h, hx = item.split(":", 1)
-        parsed.append((int(h), _hex(hx)))
+        if h == "sleep":
+            parsed.append(("sleep", float(hx)))   # dwell N seconds inside the connection
+        else:
+            parsed.append((int(h), _hex(hx)))
     summary = asyncio.run(loop.map_batch(
         DATA, address, parsed, camera=camera,
         notify_uuids=notify_uuid or None, do_pair=do_pair, response=not no_response,

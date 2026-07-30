@@ -42,6 +42,8 @@ async def map_batch(
     which is right for one-write-at-a-time opcode mapping.
     """
     for handle, _ in payloads:
+        if handle == "sleep":
+            continue  # a dwell step, not a write — no gate needed
         verdict, reason = safety.check(data_dir, handle)
         if verdict != "ALLOW":
             raise PermissionError(f"handle {handle}: {verdict} ({reason})")
@@ -51,6 +53,15 @@ async def map_batch(
 
     async with GattSession(address, notify_uuids=notify_uuids, do_pair=do_pair) as sess:
         for i, (handle, payload) in enumerate(payloads):
+            # A "sleep" step just dwells inside the held connection (lets a rail travel
+            # before the next command), capturing notifications during the wait.
+            if handle == "sleep":
+                secs = float(payload)
+                t_dwell = time.time()
+                time.sleep(secs)
+                records.append({"index": i, "dwell_s": secs,
+                                "notify_events": sess.events_since(t_dwell)})
+                continue
             step = rd / f"{i:03d}"
             step.mkdir(exist_ok=True)
 

@@ -257,11 +257,29 @@ sensor:
     unit_of_measurement: "%"
     accuracy_decimals: 0
 
-# ------------------------------------------- preset buttons
-button:
+# ------------------------------------------- position sliders (one per rail)
+# NOTE ON COUPLING: moving one rail forces the other to a default — moving the
+# BOTTOM sends the top to 100; moving the MIDDLE sends the bottom to 0. Expected;
+# the blind only supports one rail at an arbitrary position at a time.
+cover:
   - platform: template
-    name: "Blind 1 Fully Open"
-    on_press:
+    name: "Blind 1 Bottom"
+    id: blind1_bottom_cover
+    device_class: shade
+    has_position: true
+    optimistic: false
+    lambda: |-
+      if (!id(blind1_bottom).has_state()) return {};
+      return id(blind1_bottom).state / 100.0f;   // 0.0=closed(0%) .. 1.0=open(100%)
+    position_action:
+      - globals.set:
+          id: blind1_rail
+          value: "0"
+      - globals.set:
+          id: blind1_target
+          value: !lambda "return (int)(pos * 100.0f);"
+      - ble_client.connect: blind1
+    open_action:
       - globals.set:
           id: blind1_rail
           value: "0"
@@ -269,9 +287,7 @@ button:
           id: blind1_target
           value: "100"
       - ble_client.connect: blind1
-  - platform: template
-    name: "Blind 1 Fully Closed"
-    on_press:
+    close_action:
       - globals.set:
           id: blind1_rail
           value: "0"
@@ -279,29 +295,61 @@ button:
           id: blind1_target
           value: "0"
       - ble_client.connect: blind1
+    stop_action:
+      - ble_client.disconnect: blind1
   - platform: template
-    name: "Blind 1 Bottom-Up"
-    on_press:
-      - globals.set:
-          id: blind1_rail
-          value: "0"
-      - globals.set:
-          id: blind1_target
-          value: "50"
-      - ble_client.connect: blind1
-  - platform: template
-    name: "Blind 1 Top-Down"
-    on_press:
+    name: "Blind 1 Middle"
+    id: blind1_middle_cover
+    device_class: shade
+    has_position: true
+    optimistic: false
+    lambda: |-
+      if (!id(blind1_middle).has_state()) return {};
+      return id(blind1_middle).state / 100.0f;   // 0.0=closed(0%) .. 1.0=open(100%)
+    position_action:
       - globals.set:
           id: blind1_rail
           value: "1"
       - globals.set:
           id: blind1_target
-          value: "50"
+          value: !lambda "return (int)(pos * 100.0f);"
       - ble_client.connect: blind1
+    open_action:
+      - globals.set:
+          id: blind1_rail
+          value: "1"
+      - globals.set:
+          id: blind1_target
+          value: "100"
+      - ble_client.connect: blind1
+    close_action:
+      - globals.set:
+          id: blind1_rail
+          value: "1"
+      - globals.set:
+          id: blind1_target
+          value: "0"
+      - ble_client.connect: blind1
+    stop_action:
+      - ble_client.disconnect: blind1
   - platform: template
-    name: "Blind 2 Fully Open"
-    on_press:
+    name: "Blind 2 Bottom"
+    id: blind2_bottom_cover
+    device_class: shade
+    has_position: true
+    optimistic: false
+    lambda: |-
+      if (!id(blind2_bottom).has_state()) return {};
+      return id(blind2_bottom).state / 100.0f;   // 0.0=closed(0%) .. 1.0=open(100%)
+    position_action:
+      - globals.set:
+          id: blind2_rail
+          value: "0"
+      - globals.set:
+          id: blind2_target
+          value: !lambda "return (int)(pos * 100.0f);"
+      - ble_client.connect: blind2
+    open_action:
       - globals.set:
           id: blind2_rail
           value: "0"
@@ -309,9 +357,7 @@ button:
           id: blind2_target
           value: "100"
       - ble_client.connect: blind2
-  - platform: template
-    name: "Blind 2 Fully Closed"
-    on_press:
+    close_action:
       - globals.set:
           id: blind2_rail
           value: "0"
@@ -319,29 +365,61 @@ button:
           id: blind2_target
           value: "0"
       - ble_client.connect: blind2
+    stop_action:
+      - ble_client.disconnect: blind2
   - platform: template
-    name: "Blind 2 Bottom-Up"
-    on_press:
-      - globals.set:
-          id: blind2_rail
-          value: "0"
-      - globals.set:
-          id: blind2_target
-          value: "50"
-      - ble_client.connect: blind2
-  - platform: template
-    name: "Blind 2 Top-Down"
-    on_press:
+    name: "Blind 2 Middle"
+    id: blind2_middle_cover
+    device_class: shade
+    has_position: true
+    optimistic: false
+    lambda: |-
+      if (!id(blind2_middle).has_state()) return {};
+      return id(blind2_middle).state / 100.0f;   // 0.0=closed(0%) .. 1.0=open(100%)
+    position_action:
       - globals.set:
           id: blind2_rail
           value: "1"
       - globals.set:
           id: blind2_target
-          value: "50"
+          value: !lambda "return (int)(pos * 100.0f);"
       - ble_client.connect: blind2
+    open_action:
+      - globals.set:
+          id: blind2_rail
+          value: "1"
+      - globals.set:
+          id: blind2_target
+          value: "100"
+      - ble_client.connect: blind2
+    close_action:
+      - globals.set:
+          id: blind2_rail
+          value: "1"
+      - globals.set:
+          id: blind2_target
+          value: "0"
+      - ble_client.connect: blind2
+    stop_action:
+      - ble_client.disconnect: blind2
   - platform: template
-    name: "Blind 3 Fully Open"
-    on_press:
+    name: "Blind 3 Bottom"
+    id: blind3_bottom_cover
+    device_class: shade
+    has_position: true
+    optimistic: false
+    lambda: |-
+      if (!id(blind3_bottom).has_state()) return {};
+      return id(blind3_bottom).state / 100.0f;   // 0.0=closed(0%) .. 1.0=open(100%)
+    position_action:
+      - globals.set:
+          id: blind3_rail
+          value: "0"
+      - globals.set:
+          id: blind3_target
+          value: !lambda "return (int)(pos * 100.0f);"
+      - ble_client.connect: blind3
+    open_action:
       - globals.set:
           id: blind3_rail
           value: "0"
@@ -349,9 +427,7 @@ button:
           id: blind3_target
           value: "100"
       - ble_client.connect: blind3
-  - platform: template
-    name: "Blind 3 Fully Closed"
-    on_press:
+    close_action:
       - globals.set:
           id: blind3_rail
           value: "0"
@@ -359,23 +435,40 @@ button:
           id: blind3_target
           value: "0"
       - ble_client.connect: blind3
+    stop_action:
+      - ble_client.disconnect: blind3
   - platform: template
-    name: "Blind 3 Bottom-Up"
-    on_press:
-      - globals.set:
-          id: blind3_rail
-          value: "0"
-      - globals.set:
-          id: blind3_target
-          value: "50"
-      - ble_client.connect: blind3
-  - platform: template
-    name: "Blind 3 Top-Down"
-    on_press:
+    name: "Blind 3 Middle"
+    id: blind3_middle_cover
+    device_class: shade
+    has_position: true
+    optimistic: false
+    lambda: |-
+      if (!id(blind3_middle).has_state()) return {};
+      return id(blind3_middle).state / 100.0f;   // 0.0=closed(0%) .. 1.0=open(100%)
+    position_action:
       - globals.set:
           id: blind3_rail
           value: "1"
       - globals.set:
           id: blind3_target
-          value: "50"
+          value: !lambda "return (int)(pos * 100.0f);"
       - ble_client.connect: blind3
+    open_action:
+      - globals.set:
+          id: blind3_rail
+          value: "1"
+      - globals.set:
+          id: blind3_target
+          value: "100"
+      - ble_client.connect: blind3
+    close_action:
+      - globals.set:
+          id: blind3_rail
+          value: "1"
+      - globals.set:
+          id: blind3_target
+          value: "0"
+      - ble_client.connect: blind3
+    stop_action:
+      - ble_client.disconnect: blind3

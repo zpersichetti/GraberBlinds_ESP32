@@ -8,15 +8,27 @@ no hub, no cloud**. Includes the reverse-engineering harness used to map the BLE
 > is **unencrypted** — commands are plaintext ATT writes guarded only by a per-device numeric
 > token. Your motors may differ; verify before trusting.
 
-## What works (v1)
+## What works
 
 - **Phone-less control** from an ESP32 over BLE (validated on hardware).
-- **Top-down / bottom-up** support — both rails, via four preset states per blind:
-  Fully Open, Fully Closed, Bottom-Up, Top-Down.
+- **Independent per-rail position sliders** — a **Bottom** and a **Middle** cover per blind,
+  each a 0–100 slider. See the coupling note below.
 - **Passive position feedback** — each motor broadcasts both rail positions in its BLE
   advertising, so Home Assistant sees position **without holding a connection**.
 - **Multi-blind** — one ESP32 bridges several motors; commands connect on-demand (~a few
   seconds each) so your phone app still works.
+
+### Rail coupling (important)
+
+The motor only holds **one rail at an arbitrary position at a time** — moving one rail forces
+the other to a default:
+
+- Moving the **Bottom** rail sends the **top/middle to 100** (bottom-up mode).
+- Moving the **Middle** rail sends the **bottom to 0** (top-down mode).
+
+So each slider works fully on its own rail; just expect the *other* rail to ride to its
+extreme. True "floating band" (both rails at arbitrary mid positions) was not achievable with
+the commands mapped so far.
 
 ## How it works (protocol summary)
 
@@ -34,7 +46,7 @@ Full details in [`notes/protocol.md`](notes/protocol.md). In brief:
 
 | Path | What |
 |------|------|
-| `esphome/graber-blinds.yaml` | ESPHome config — 3 blinds, 4 preset buttons + 2 position sensors each |
+| `esphome/graber-blinds.yaml` | ESPHome config — 3 blinds, Bottom + Middle position sliders + 2 position sensors each |
 | `esphome/secrets.yaml.example` | Template for WiFi / API key / AP password |
 | `notes/protocol.md` | The reverse-engineered protocol map |
 | `harness/` | Python tooling used to sniff & map the protocol (bleak + nRF Sniffer/tshark) |
@@ -68,7 +80,9 @@ your own risk.
 
 ## Status / roadmap
 
-- [x] Protocol mapped, phone-less control, TDBU presets, passive position, multi-blind
-- [ ] Independent dual-rail positioning (needs the "move both rails" opcode — `0x16`/`0x18`,
-      seen but unconfirmed)
+- [x] Protocol mapped, phone-less control, passive position, multi-blind
+- [x] Per-rail position sliders (Bottom + Middle), 0–100
+- [~] Floating band (both rails at arbitrary mid positions): the exec codes `0x14`/`0x16`/`0x18`
+      each force the partner rail to a default; controlled tests could not hold both. May be a
+      hard limit of the motor, or an un-cracked command sequence.
 - [ ] Faster commands (persistent-connection option)
